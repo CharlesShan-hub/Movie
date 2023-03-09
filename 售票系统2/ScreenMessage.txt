@@ -1,0 +1,11 @@
+Houde  1  Imax
+Houde  2  2D
+Houde  3  3D
+Boxue  1  Imax
+Boxue  2  2D
+Boxue  3  3D
+Boxue  4  4D
+Mashi  1  Imax
+Mashi  2  2D
+Mashi  3  3D
+Mashi  4  4D
