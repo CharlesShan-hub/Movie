@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "ios": "cpp",
+    "*.tcc": "cpp",
+    "typeinfo": "cpp",
+    "chrono": "cpp",
+    "text_encoding": "cpp",
+    "__config": "cpp",
+    "cstdio": "cpp",
+    "ostream": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
+}
