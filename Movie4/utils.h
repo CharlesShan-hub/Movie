@@ -18,6 +18,13 @@ void check_file(const char path[])
         fclose(f);
 }
 
+void debug_print(const char *str)
+{
+    printf("%s\n", str);
+    getchar();
+    getchar();
+}
+
 void get_string(char res[], int count, ...)
 {
     va_list ap;

@@ -38,13 +38,20 @@ typedef struct
 typedef union
 {
     AdminProfile admin;
-    CustomerProfile customer;
+    CustomerProfile cust;
 } Profile;
 Profile PROFILE;
+
+enum User
+{
+    Admin,
+    Cust
+};
 
 /* utils */
 void clear_screen();
 void check_file(const char *path);
+void debug_print(const char *str);
 int get_choice(int start, int end, int count, ...);
 void get_string(int count, ...);
 bool judge_num(char num[BUFFER_SIZE]);
@@ -53,10 +60,10 @@ bool judge_digit(char str[BUFFER_SIZE]);
 bool judge_digit_and_letter(char str[BUFFER_SIZE]);
 bool judge_only_digit_and_letter(char str[BUFFER_SIZE]);
 
-/* Auth */
+/* auth */
 bool _id_duplicate_admin(char *user_id);
 bool _id_duplicate_cust(char *user_id);
-bool _regist_get_id(char *user_id, const char *tip);
+bool _regist_get_id(char *user_id, const char *tip, enum User user);
 bool _regist_get_code(char *code, const char *tip);
 bool _regist_get_name(char *name, const char *tip);
 bool _regist_get_cinema(char *cinema, const char *tip);
@@ -65,8 +72,22 @@ bool _regist_get_sex(char *sex, const char *tip);
 bool _regist_get_tele(char *tele, const char *tip);
 bool _regist_check_admin(AdminProfile ap);
 bool _regist_check_cust(CustomerProfile ap);
-void regist_admin();
-void regist_cust();
+bool _login_get_id(char *user_id, const char *tip, enum User user);
+bool _login_get_code(char *code, const char *tip, const char *tip2);
+bool _login_check_admin(char *user_id, char *code);
+bool _login_check_cust(char *user_id, char *code);
+bool ui_regist_admin(); // return whether to return
+bool ui_regist_cust();
+void ui_regist();
+bool ui_login_admin();
+bool ui_login_cust();
+void ui_login();
+
+/* admin */
+void ui_admin();
+
+/* cust */
+void ui_cust();
 
 void init()
 {

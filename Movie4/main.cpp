@@ -1,6 +1,8 @@
 #include "movie.h"
 #include "utils.h"
 #include "auth.h"
+#include "admin.h"
+#include "cust.h"
 
 int main()
 {
@@ -15,10 +17,10 @@ int main()
         switch (get_choice(1, 3, 2, tip, "Please enter your choice:"))
         {
         case 1:
-            regist();
+            ui_regist();
             break;
         case 2:
-            login();
+            ui_login();
             break;
         case 3:
             return 0;
