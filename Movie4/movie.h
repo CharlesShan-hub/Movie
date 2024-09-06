@@ -14,6 +14,7 @@
 #define BUFFER_SIZE 128
 const char ADMIN_PROFILE_PATH[] = "admin_profile.txt";
 const char CUSTOMER_PROFILE_PATH[] = "cust_profile.txt";
+#define NEW_CUST_INIT_MONEY 20.0
 
 typedef struct
 {
@@ -40,13 +41,28 @@ typedef union
     AdminProfile admin;
     CustomerProfile cust;
 } Profile;
-Profile PROFILE;
 
 enum User
 {
     Admin,
     Cust
 };
+User ADMIN = Admin;
+User CUST = Cust;
+
+typedef struct
+{
+    bool login;
+    User type;
+    Profile profile;
+} RuntimeInfo;
+RuntimeInfo RUNTIME_INFO;
+
+/* data structure */
+void set_admin_profile(Profile p);
+void write_admin_profile(Profile p);
+void set_cust_profile(Profile p);
+void write_cust_profile(Profile p);
 
 /* utils */
 void clear_screen();
@@ -85,12 +101,53 @@ void ui_login();
 
 /* admin */
 void ui_admin();
+bool ui_admin_profile();
+void ui_admin_profile_check();
+void ui_admin_profile_modify();
 
 /* cust */
 void ui_cust();
 
 void init()
 {
+    RUNTIME_INFO.login = false;
     check_file(ADMIN_PROFILE_PATH);
     check_file(CUSTOMER_PROFILE_PATH);
+}
+
+void set_admin_profile(Profile p)
+{
+    strcpy(RUNTIME_INFO.profile.admin.cinema, p.admin.cinema);
+    strcpy(RUNTIME_INFO.profile.admin.mail, p.admin.mail);
+    strcpy(RUNTIME_INFO.profile.admin.name, p.admin.name);
+    strcpy(RUNTIME_INFO.profile.admin.id, p.admin.id);
+    strcpy(RUNTIME_INFO.profile.admin.code, p.admin.code);
+}
+
+void write_admin_profile(Profile p)
+{
+    FILE *file = fopen(ADMIN_PROFILE_PATH, "a+");
+    fprintf(file, "%s  %s  %s  %s  %s\n",
+            p.admin.id, p.admin.code, p.admin.name, p.admin.cinema, p.admin.mail);
+    fclose(file);
+}
+
+void set_cust_profile(Profile p)
+{
+
+    strcpy(RUNTIME_INFO.profile.cust.id, p.cust.id);
+    strcpy(RUNTIME_INFO.profile.cust.code, p.cust.code);
+    strcpy(RUNTIME_INFO.profile.cust.mail, p.cust.mail);
+    strcpy(RUNTIME_INFO.profile.cust.name, p.cust.name);
+    strcpy(RUNTIME_INFO.profile.cust.sex, p.cust.sex);
+    strcpy(RUNTIME_INFO.profile.cust.tele, p.cust.tele);
+    RUNTIME_INFO.profile.cust.money = p.cust.money;
+}
+
+void write_cust_profile(Profile p)
+{
+    FILE *file = fopen(CUSTOMER_PROFILE_PATH, "a+");
+    fprintf(file, "%s  %s  %s  %s  %s  %lf  %s\n",
+            p.cust.id, p.cust.name, p.cust.sex, p.cust.tele, p.cust.code, p.cust.money, p.cust.mail);
+    fclose(file);
 }

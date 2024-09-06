@@ -284,105 +284,6 @@ bool _regist_check_cust(CustomerProfile cp)
     }
 }
 
-bool ui_regist_admin()
-{
-    const char tip[] =
-        "*********** Registration Page - Administrator **********\n\n"
-        "[Enter 'q' at any prompt to stop registration]\n";
-    AdminProfile ap;
-    User admin = Admin;
-    while (true)
-    {
-        if (!_regist_get_id(ap.id, tip, admin))
-            return true;
-        if (!_regist_get_code(ap.code, tip))
-            return true;
-        if (!_regist_get_name(ap.name, tip))
-            return true;
-        if (!_regist_get_cinema(ap.cinema, tip))
-            return true;
-        if (!_regist_get_mail(ap.mail, tip))
-            return true;
-        if (!_regist_check_admin(ap))
-            return true;
-        break;
-    }
-    strcpy(PROFILE.admin.cinema, ap.cinema);
-    strcpy(PROFILE.admin.mail, ap.mail);
-    strcpy(PROFILE.admin.name, ap.name);
-    strcpy(PROFILE.admin.id, ap.id);
-    strcpy(PROFILE.admin.code, ap.code);
-    FILE *file = fopen(ADMIN_PROFILE_PATH, "a+");
-    fprintf(file, "%s  %s  %s  %s  %s\n",
-            ap.id, ap.code, ap.name, ap.cinema, ap.mail);
-    fclose(file);
-    ui_admin();
-    return false;
-}
-
-bool ui_regist_cust()
-{
-    const char tip[] =
-        "*********** Registration Page - Customer **********\n\n"
-        "[Enter 'q' at any prompt to stop registration]\n";
-    CustomerProfile cp;
-    User cust = Cust;
-    while (true)
-    {
-        if (!_regist_get_id(cp.id, tip, cust))
-            return true;
-        if (!_regist_get_code(cp.code, tip))
-            return true;
-        if (!_regist_get_name(cp.name, tip))
-            return true;
-        if (!_regist_get_sex(cp.sex, tip))
-            return true;
-        if (!_regist_get_tele(cp.tele, tip))
-            return true;
-        if (!_regist_get_mail(cp.mail, tip))
-            return true;
-        break;
-    }
-    strcpy(PROFILE.cust.id, cp.id);
-    strcpy(PROFILE.cust.code, cp.code);
-    strcpy(PROFILE.cust.mail, cp.mail);
-    strcpy(PROFILE.cust.name, cp.name);
-    strcpy(PROFILE.cust.sex, cp.sex);
-    strcpy(PROFILE.cust.tele, cp.tele);
-    PROFILE.cust.money = cp.money = 0.0;
-    FILE *file = fopen(CUSTOMER_PROFILE_PATH, "a+");
-    fprintf(file, "%s  %s  %s  %s  %s  %lf  %s\n",
-            cp.id, cp.name, cp.sex, cp.tele, cp.code, cp.money, cp.mail);
-    fclose(file);
-    ui_cust();
-    return false;
-}
-
-void ui_regist()
-{
-    const char tip_base[] =
-        "*********** Registration Interface **********\n\n"
-        "If you are an administrator, please enter 1\n"
-        "If you are a customer, please enter 2\n"
-        "To return to the previous menu, please enter 3\n";
-    while (true)
-    {
-        switch (get_choice(1, 3, 2, tip_base, "Please enter your choice:"))
-        {
-        case 1:
-            if (!ui_regist_admin())
-                return;
-            break;
-        case 2:
-            if (!ui_regist_cust())
-                return;
-            break;
-        case 3:
-            return;
-        }
-    }
-}
-
 bool _login_get_id(char *user_id, const char *tip, enum User user)
 {
     bool unexist_tip = false;
@@ -430,19 +331,15 @@ bool _login_get_code(char *code, const char *tip, const char *tip2)
 
 bool _login_check_admin(char *user_id, char *code)
 {
-    AdminProfile tmp;
+    Profile p;
     FILE *file = fopen(ADMIN_PROFILE_PATH, "r");
     rewind(file);
     while (fscanf(file, "%s  %s  %s  %s  %s",
-                  tmp.id, tmp.code, tmp.name, tmp.cinema, tmp.mail) != EOF)
+                  p.admin.id, p.admin.code, p.admin.name, p.admin.cinema, p.admin.mail) != EOF)
     {
-        if (!strcmp(user_id, tmp.id) && !strcmp(code, tmp.code))
+        if (!strcmp(user_id, p.admin.id) && !strcmp(code, p.admin.code))
         {
-            strcpy(PROFILE.admin.cinema, tmp.cinema);
-            strcpy(PROFILE.admin.mail, tmp.mail);
-            strcpy(PROFILE.admin.name, tmp.name);
-            strcpy(PROFILE.admin.id, tmp.id);
-            strcpy(PROFILE.admin.code, tmp.code);
+            set_admin_profile(p);
             fclose(file);
             return true;
         }
@@ -453,112 +350,19 @@ bool _login_check_admin(char *user_id, char *code)
 
 bool _login_check_cust(char *user_id, char *code)
 {
-    CustomerProfile tmp;
+    Profile p;
     FILE *file = fopen(CUSTOMER_PROFILE_PATH, "r");
     rewind(file);
     while (fscanf(file, "%s  %s  %s  %s  %s  %lf  %s\n",
-                  tmp.id, tmp.name, tmp.sex, tmp.tele, tmp.code, &tmp.money, tmp.mail) != EOF)
+                  p.cust.id, p.cust.name, p.cust.sex, p.cust.tele, p.cust.code, &p.cust.money, p.cust.mail) != EOF)
     {
-        if (!strcmp(user_id, tmp.id) && !strcmp(code, tmp.code))
+        if (!strcmp(user_id, p.cust.id) && !strcmp(code, p.cust.code))
         {
-            strcpy(PROFILE.cust.id, tmp.id);
-            strcpy(PROFILE.cust.code, tmp.code);
-            strcpy(PROFILE.cust.mail, tmp.mail);
-            strcpy(PROFILE.cust.name, tmp.name);
-            strcpy(PROFILE.cust.sex, tmp.sex);
-            strcpy(PROFILE.cust.tele, tmp.tele);
-            PROFILE.cust.money = tmp.money;
+            set_cust_profile(p);
             fclose(file);
             return true;
         }
     }
     fclose(file);
     return false;
-}
-
-bool ui_login_admin()
-{
-    const char tip[] =
-        "*********** Login Page - Administrator **********\n\n"
-        "[Enter 'q' at any prompt to stop login]\n";
-    char tip2[BUFFER_SIZE] = "";
-    AdminProfile ap;
-    enum User admin = Admin;
-    for (int i = 1; i < 4; i++)
-    {
-        if (i == 1)
-            strcpy(tip2, "");
-        else
-            sprintf(tip2, "You have %d times to try!\n", 4 - i);
-        while (true)
-        {
-            if (i == 1 && !_login_get_id(ap.id, tip, admin))
-                return true;
-            if (!_login_get_code(ap.code, tip, tip2))
-                return true;
-            break;
-        }
-        if (_login_check_admin(ap.id, ap.code))
-        {
-            ui_admin();
-            return false;
-        }
-    }
-    return true;
-}
-
-bool ui_login_cust()
-{
-    const char tip[] =
-        "*********** Login Page - Customer **********\n\n"
-        "[Enter 'q' at any prompt to stop login]\n";
-    char tip2[BUFFER_SIZE] = "";
-    CustomerProfile cp;
-    enum User cust = Cust;
-    for (int i = 1; i < 4; i++)
-    {
-        if (i == 1)
-            strcpy(tip2, "");
-        else
-            sprintf(tip2, "You have %d times to try!\n", 4 - i);
-        while (true)
-        {
-            if (i == 1 && !_login_get_id(cp.id, tip, cust))
-                return true;
-            if (!_login_get_code(cp.code, tip, tip2))
-                return true;
-            break;
-        }
-        if (_login_check_cust(cp.id, cp.code))
-        {
-            ui_cust();
-            return false;
-        }
-    }
-    return true;
-}
-
-void ui_login()
-{
-    const char tip_base[] =
-        "*********** Login Interface **********\n\n"
-        "If you are an administrator, please enter 1\n"
-        "If you are a customer, please enter 2\n"
-        "To return to the previous menu, please enter 3\n";
-    while (true)
-    {
-        switch (get_choice(1, 3, 2, tip_base, "Please enter your choice:"))
-        {
-        case 1:
-            if (!ui_login_admin())
-                return;
-            break;
-        case 2:
-            if (!ui_login_cust())
-                return;
-            break;
-        case 3:
-            return;
-        }
-    }
 }
